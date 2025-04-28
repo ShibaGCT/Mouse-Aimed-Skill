@@ -1,0 +1,72 @@
+local eventstart = game.ReplicatedStorage:FindFirstChild("SkillStarted")
+local eventended = game.ReplicatedStorage:FindFirstChild("SkillEnded")
+local runservice = game:GetService("RunService")
+local debris = game:GetService("Debris")
+
+
+local holdAnimation = game:GetService("ServerStorage"):FindFirstChild("Animation"):FindFirstChild("Charge")
+
+
+local releaseAnimation = game:GetService("ServerStorage"):FindFirstChild("Animation"):FindFirstChild("Release")
+
+
+local holdingAnimations = {}
+
+eventstart.OnServerEvent:Connect(function(plr)
+	local humanoid = plr.Character:FindFirstChild("Humanoid")
+	if humanoid then
+		local anim = humanoid:LoadAnimation(holdAnimation)
+		anim:Play()
+		holdingAnimations[plr] = anim
+	end
+end)
+
+eventended.OnServerEvent:Connect(function(plr, cursorPosition)
+	local humanoid = plr.Character:FindFirstChild("Humanoid")
+
+	if holdingAnimations[plr] then
+		holdingAnimations[plr]:Stop()
+		holdingAnimations[plr] = nil
+	end
+
+	if humanoid then
+		local anim2 = humanoid:LoadAnimation(releaseAnimation)
+		anim2:Play()
+	end
+	
+	local hitbox = Instance.new("Part")
+	hitbox.Size = Vector3.new(8, 8, 8) -- hitbox size
+	hitbox.Parent = workspace
+	hitbox.Transparency = 1  
+	hitbox.BrickColor = BrickColor.new("Really red")
+	hitbox.Anchored = true
+	hitbox.CanCollide = false
+	hitbox.CanTouch = true
+
+	hitbox.Position = cursorPosition + Vector3.new(0, hitbox.Size.Y / 2, 0)
+	
+	local attachment = Instance.new("Attachment")
+	attachment.Parent = hitbox
+	
+	local particles = game:GetService("ServerStorage"):FindFirstChild("Particles"):FindFirstChild("Slashes1"):Clone() -- Particles
+	particles.Parent = attachment
+	particles.Enabled = true
+	
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://YOUR SOUND ID" -- put your sound id here
+	sound.Parent = hitbox
+	sound.PlaybackSpeed = 2
+	
+	sound:Play()
+		
+	debris:AddItem(hitbox, 1.75)
+	
+	hitbox.Touched:Connect(function(touchpart)
+		if touchpart.Parent:FindFirstChild("Humanoid") and touchpart.Parent.Name ~= plr.Name then
+			for i = 1, 20 do
+				touchpart.Parent:FindFirstChild("Humanoid"):TakeDamage(0.3) -- adjust damage here
+				task.wait(.1)
+			end
+		end
+	end)
+end)
