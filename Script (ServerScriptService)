@@ -48,7 +48,7 @@ eventended.OnServerEvent:Connect(function(plr, cursorPosition)
 	local attachment = Instance.new("Attachment")
 	attachment.Parent = hitbox
 	
-	local particles = game:GetService("ServerStorage"):FindFirstChild("Particles"):FindFirstChild("Slashes1"):Clone() -- Particles
+	local particles = game:GetService("ServerStorage"):FindFirstChild("Particles"):FindFirstChild("Particle1"):Clone() -- 
 	particles.Parent = attachment
 	particles.Enabled = true
 	
