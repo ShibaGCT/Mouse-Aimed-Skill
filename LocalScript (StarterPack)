@@ -1,0 +1,41 @@
+local uip = game:GetService("UserInputService")
+local eventstart = game.ReplicatedStorage:FindFirstChild("SkillStarted")
+local eventended = game.ReplicatedStorage:FindFirstChild("SkillEnded")
+local cursor = game.ReplicatedStorage:FindFirstChild("cursor")
+local runservice = game:GetService("RunService")
+local plr = game:GetService("Players").LocalPlayer
+
+uip.InputBegan:Connect(function(input, gpe)
+	if gpe then
+		return
+	end
+	if input.KeyCode == Enum.KeyCode.E then
+		eventstart:FireServer()
+		holding = true
+	end
+end)
+
+uip.InputEnded:Connect(function(input, gpe)
+
+	local mouse = plr:GetMouse()
+	local cursorPosition = mouse.Hit.Position
+	
+	if gpe then
+		return
+	end
+	if input.KeyCode == Enum.KeyCode.E then
+		eventended:FireServer(cursorPosition)
+		holding = false
+	end
+end)
+
+runservice.RenderStepped:Connect(function()
+	local char = plr.Character
+	local cursor = plr:GetMouse().Hit.Position
+	if holding == true then
+		char:FindFirstChild("HumanoidRootPart").CFrame = CFrame.new(char:FindFirstChild("HumanoidRootPart").Position, cursor)
+		char:FindFirstChild("HumanoidRootPart").Anchored = true
+	else
+		char:FindFirstChild("HumanoidRootPart").Anchored = false
+	end
+end)
